@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心滴 CareDrop · 使用者測試</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{--bg:#F5EFDF;--bg2:#EBE3CC;--main:#8AA67A;--dark:#5C7849;--darker:#3D5230;--text:#2A3520;--text2:#6B7558;--white:#FBF6E9;--card:#FFFCF1;--shadow:0 4px 16px rgba(60,80,40,0.10);--font-hand:'LXGW WenKai TC',serif;--font-ui:'Noto Sans TC',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{font-family:var(--font-ui);background:#E5DDC3;min-height:100vh;color:var(--text);}
+body{display:flex;justify-content:center;}
+.app{width:100%;max-width:480px;min-height:100vh;background:var(--bg);position:relative;overflow-x:hidden;}
+.screen{display:none;flex-direction:column;min-height:100vh;padding:0 0 100px;animation:fadeIn .3s;}
+.screen.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.header{padding:28px 24px 12px;background:var(--white);}
+.h-title{font-family:var(--font-hand);font-size:24px;font-weight:700;color:var(--text);}
+.h-sub{font-size:14px;color:var(--text2);margin-top:6px;line-height:1.6;}
+.h-pid{display:inline-block;margin-top:8px;padding:3px 10px;background:var(--bg);color:var(--darker);font-size:12px;font-family:var(--font-hand);border-radius:10px;font-weight:700;}
+.content{padding:20px 24px;flex:1;}
+.btn{background:var(--dark);color:white;border:none;border-radius:14px;padding:16px;width:100%;font-size:17px;font-weight:700;font-family:var(--font-ui);cursor:pointer;margin-top:12px;}
+.btn:active{transform:scale(0.98);}
+.btn:disabled{background:#A0A899;cursor:not-allowed;}
+.input{width:100%;padding:16px;font-size:17px;font-family:var(--font-ui);background:var(--white);border:1.5px solid var(--bg2);border-radius:14px;margin-top:8px;}
+.input:focus{outline:none;border-color:var(--main);}
+textarea.input{resize:vertical;min-height:80px;font-family:var(--font-hand);font-size:16px;line-height:1.7;}
+.label{font-size:14px;color:var(--text2);font-weight:600;margin-top:18px;margin-bottom:6px;display:block;}
+.emotions{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px;}
+.em{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;background:var(--card);border:2px solid transparent;border-radius:14px;cursor:pointer;}
+.em:active{transform:scale(0.95);}
+.em.selected{background:var(--bg2);border-color:var(--main);}
+.em-svg{width:38px;height:46px;}
+.em-svg svg{width:100%;height:100%;display:block;}
+.em-name{font-family:var(--font-hand);font-size:13px;font-weight:600;color:var(--text);}
+.hint{font-size:13px;color:var(--text2);margin-top:8px;font-family:var(--font-hand);}
+.activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+.act-btn{padding:20px 12px;background:var(--card);border:2px solid var(--bg2);border-radius:16px;font-family:var(--font-hand);font-size:16px;font-weight:600;color:var(--text);cursor:pointer;text-align:center;}
+.act-btn:active{transform:scale(0.97);}
+.act-btn.selected{background:var(--bg2);border-color:var(--main);color:var(--darker);}
+.act-icon{font-size:28px;display:block;margin-bottom:6px;}
+.reasons{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.reason{display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border:1.5px solid var(--bg2);border-radius:12px;cursor:pointer;}
+.reason.selected{background:var(--bg2);border-color:var(--main);}
+.reason-cb{width:22px;height:22px;border:2px solid var(--main);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:white;}
+.reason.selected .reason-cb{background:var(--dark);}
+.reason.selected .reason-cb::after{content:"✓";color:white;font-weight:700;font-size:14px;}
+.reason-label{font-size:15px;color:var(--text);}
+.slider-row{margin-top:12px;}
+.slider{width:100%;-webkit-appearance:none;height:6px;background:var(--bg2);border-radius:3px;outline:none;}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;background:var(--dark);border-radius:50%;cursor:pointer;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.2);}
+.slider-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:6px;}
+.slider-value{text-align:center;font-family:var(--font-hand);font-size:32px;font-weight:700;color:var(--dark);margin-top:8px;}
+.ai-card{background:var(--card);margin:20px 0;border-radius:18px;padding:24px 22px;box-shadow:var(--shadow);border-left:4px solid var(--main);}
+.ai-label{font-size:11px;letter-spacing:2px;color:var(--text2);font-weight:700;margin-bottom:14px;}
+.ai-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--bg2);font-size:14px;gap:10px;}
+.ai-row:last-child{border-bottom:none;}
+.ai-row-label{color:var(--text2);flex-shrink:0;}
+.ai-row-value{color:var(--text);font-weight:600;text-align:right;}
+.ai-status{margin-top:14px;padding:10px;background:var(--bg);border-radius:10px;text-align:center;font-size:13px;color:var(--text2);font-family:var(--font-hand);}
+.q-card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);}
+.q-num{font-size:11px;color:var(--text2);font-weight:700;letter-spacing:1.5px;}
+.q-title{font-size:11px;color:var(--main);font-weight:700;letter-spacing:1.5px;margin-top:4px;}
+.q-text{font-size:15px;color:var(--text);font-weight:500;margin-top:8px;line-height:1.6;font-family:var(--font-hand);}
+.q-options{display:flex;justify-content:space-between;gap:6px;margin-top:14px;}
+.q-opt{flex:1;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:var(--bg);border:1.5px solid var(--bg2);border-radius:10px;cursor:pointer;font-weight:700;font-size:15px;color:var(--text2);}
+.q-opt:active{transform:scale(0.94);}
+.q-opt.selected{background:var(--dark);color:white;border-color:var(--dark);}
+.q-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:6px;}
+.progress{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:3px;background:var(--bg2);z-index:100;}
+.progress-bar{height:100%;background:var(--main);transition:width .3s;}
+.thank-you{text-align:center;padding:60px 30px;}
+.thank-you-icon{font-size:64px;margin-bottom:20px;}
+.thank-you h2{font-family:var(--font-hand);font-size:28px;color:var(--darker);margin-bottom:14px;}
+.thank-you p{font-size:15px;color:var(--text2);line-height:1.8;}
+.error-box{background:#FBE8DA;color:#B26B4A;padding:14px;border-radius:10px;font-size:14px;margin-top:12px;border-left:3px solid #B26B4A;}
+.error-box code{display:block;margin-top:6px;background:white;padding:8px;border-radius:6px;font-size:11px;word-break:break-all;font-family:monospace;}
+.loading{position:fixed;inset:0;background:rgba(245,239,223,0.92);display:none;align-items:center;justify-content:center;z-index:200;flex-direction:column;gap:16px;}
+.loading.active{display:flex;}
+.spinner{width:48px;height:48px;border:4px solid var(--bg2);border-top-color:var(--dark);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-family:var(--font-hand);color:var(--text2);font-size:14px;}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-bar" id="progress-bar" style="width:0%;"></div></div>
+
+<div class="app">
+
+<div class="screen active" id="screen-intro">
+  <div class="header">
+    <div class="h-title">心滴 CareDrop</div>
+    <div class="h-sub">使用者測試</div>
+    <div class="h-pid" id="pid-display">配發中...</div>
+  </div>
+  <div class="content">
+    <div style="text-align:center;font-size:60px;margin:30px 0 10px;">🌱</div>
+    <p style="text-align:center;font-family:var(--font-hand);font-size:18px;line-height:1.7;margin:20px 0 30px;">歡迎參與本研究<br>你的回饋對我們很珍貴</p>
+    <p style="font-family:var(--font-hand);font-size:15px;line-height:2;margin-bottom:8px;">接下來會經過 3 個小任務：</p>
+    <div style="font-family:var(--font-hand);font-size:14px;line-height:2;margin-bottom:20px;padding-left:8px;">
+      1️⃣　回顧上週感受<br>
+      2️⃣　記錄這週舒壓 + 現在心情<br>
+      3️⃣　收到 AI 的整合回饋
+    </div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;">最後會有 3 份簡短量表，請依您的真實感受填寫。<br>測試過程中沒有正確答案。</p>
+    <div id="init-error" class="error-box" style="display:none;"></div>
+    <button class="btn" id="btn-start" onclick="startTask1()" disabled>準備中…</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-task1">
+  <div class="header"><div class="h-title">任務 1</div><div class="h-sub">回想上週，你經歷了哪些感受？</div></div>
+  <div class="content">
+    <span class="label">請選 2-3 個（至少 2 個）</span>
+    <div class="emotions" id="emotions-task1"></div>
+    <div class="hint" id="t1-hint">已選 0 個</div>
+    <button class="btn" id="btn-task1-next" disabled onclick="completeTask1()">下一步</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-task2a">
+  <div class="header"><div class="h-title">任務 2</div><div class="h-sub">這週你做了什麼舒壓？</div></div>
+  <div class="content">
+    <span class="label">類別</span>
+    <div class="activity-grid">
+      <div class="act-btn" data-type="behavior" onclick="selectActivity(this,'behavior')"><span class="act-icon">🚶</span>行為紀錄</div>
+      <div class="act-btn" data-type="creation" onclick="selectActivity(this,'creation')"><span class="act-icon">🎨</span>創作紀錄</div>
+    </div>
+    <span class="label">請描述你的活動或作品（簡短即可）</span>
+    <textarea id="activity-text" class="input" placeholder="例如：和諧粉彩、捲紙、散步、聽音樂..." maxlength="200"></textarea>
+    <span class="label">完成這個活動後，現在感覺如何？</span>
+    <div class="emotions" id="emotions-now"></div>
+    <button class="btn" id="btn-task2a-next" disabled onclick="goTask2b()">下一步</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-task2b">
+  <div class="header"><div class="h-title">任務 2 · 補充</div><div class="h-sub">幫助你看見自己（可全部跳過）</div></div>
+  <div class="content">
+    <span class="label">想記下的話（選填，20 字內）</span>
+    <textarea id="diary-text" class="input" placeholder="今天想說的一句話..." maxlength="20"></textarea>
+    <span class="label">是什麼讓心情這樣？（可複選）</span>
+    <div class="reasons" id="reasons-list"></div>
+    <span class="label">今天照顧家人的感覺</span>
+    <div class="slider-row">
+      <div class="slider-value" id="diff-value">4</div>
+      <input type="range" min="1" max="7" value="4" class="slider" id="diff-slider" oninput="document.getElementById('diff-value').textContent=this.value;">
+      <div class="slider-labels"><span>輕鬆 1</span><span>困難 7</span></div>
+    </div>
+    <button class="btn" onclick="completeTask2()">下一步</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-task3">
+  <div class="header"><div class="h-title">任務 3</div><div class="h-sub">AI 整合回饋</div></div>
+  <div class="content">
+    <div class="ai-card"><div class="ai-label">系統紀錄整合</div><div id="ai-card-body"></div></div>
+    <button class="btn" onclick="completeTask3()">繼續完成量表</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-sus"><div class="header"><div class="h-title">系統可用性問卷</div><div class="h-sub">10 題，請依使用感受回答</div></div><div class="content" id="sus-content"></div></div>
+<div class="screen" id="screen-ux"><div class="header"><div class="h-title">使用者體驗問卷</div><div class="h-sub">4 題</div></div><div class="content" id="ux-content"></div></div>
+<div class="screen" id="screen-ai-accept"><div class="header"><div class="h-title">AI 訊息感受</div><div class="h-sub">3 題</div></div><div class="content" id="ai-content"></div></div>
+
+<div class="screen" id="screen-thanks">
+  <div class="thank-you">
+    <div class="thank-you-icon">🌿</div>
+    <h2>感謝您的參與</h2>
+    <p>您的回饋會幫助我們<br>設計出更貼近家庭照顧者的工具<br><br>請將手機交回給研究人員</p>
+    <p style="margin-top:30px;font-size:13px;color:var(--text2);font-family:var(--font-hand);" id="thanks-id"></p>
+  </div>
+</div>
+
+</div>
+
+<div class="loading" id="loading"><div class="spinner"></div><div class="loading-text" id="loading-text">儲存中...</div></div>
+
+<script>
+// ====== 純 fetch() 連 Supabase REST API（不用 supabase-js 函式庫）======
+const SUPABASE_URL = 'https://fhzvsjeheroindqhdkht.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoenZzamVoZXJvaW5kcWhka2h0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNDc5ODAsImV4cCI6MjA5MzYyMzk4MH0.TjQ-EX-qzFn4nx5AkXfSPfX9PlJl0Y3cDW4ZLIKqYog';
+
+async function sbFetch(path, options = {}) {
+  const url = SUPABASE_URL + '/rest/v1' + path;
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...(options.headers || {})
+    }
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`${res.status} ${txt}`);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function sbInsert(table, data) {
+  return sbFetch('/' + table, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function sbUpdate(table, idCol, idVal, data) {
+  return sbFetch(`/${table}?${idCol}=eq.${encodeURIComponent(idVal)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  });
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+const CONDITION = (urlParams.get('c') || 'A1B1').toUpperCase();
+const SESSION_ID = urlParams.get('s') || 'S01';
+
+const EMOTIONS = [
+  {key:'calm',name:'平靜',svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#C8DDC0" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -10,2 Q -7,5 -4,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,2 Q 7,5 10,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M -6,18 Q 0,21 6,18" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/></svg>'},
+  {key:'relaxed',name:'放鬆',svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#F5DBB0" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -12,2 Q -8,-2 -4,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,2 Q 8,-2 12,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M -8,16 Q 0,24 8,16" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/></svg>'},
+  {key:'tired',name:'疲累',svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#E5C9B0" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -12,4 L -4,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,2 L 12,4" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M -7,20 Q 0,18 7,20" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/></svg>'},
+  {key:'worried',name:'擔心',svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#D4D8E0" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -12,-2 L -4,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,2 L 12,-2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><circle cx="0" cy="20" r="2.2" fill="#3a4530"/></svg>'},
+  {key:'sad',name:'難過',svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#C8C4D8" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -12,4 Q -8,0 -4,4" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,4 Q 8,0 12,4" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M -7,22 Q 0,16 7,22" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/></svg>'}
+];
+const EMO_BY_KEY = Object.fromEntries(EMOTIONS.map(e=>[e.key,e]));
+const REASONS = [{key:'economic',name:'經濟狀況'},{key:'relationship',name:'人際關係'},{key:'health',name:'健康狀況'},{key:'learning',name:'學習狀況'},{key:'other',name:'其他'}];
+
+const state = {
+  participantId: null,
+  taskTimes: {},
+  data: {
+    task1_emotions: [], task2_activity_type: null, task2_activity_text: '',
+    task2_current_emotion: null, task2b_diary: '', task2b_reasons: [], task2b_difficulty: 4,
+    sus: Array(10).fill(null), ux: Array(4).fill(null), ai_acceptance: Array(3).fill(null)
+  }
+};
+
+const SCREENS = ['intro','task1','task2a','task2b','task3','sus','ux','ai-accept','thanks'];
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('progress-bar').style.width = (SCREENS.indexOf(name)/(SCREENS.length-1)*100)+'%';
+  window.scrollTo(0,0);
+}
+function showLoading(t){document.getElementById('loading-text').textContent=t||'處理中...';document.getElementById('loading').classList.add('active');}
+function hideLoading(){document.getElementById('loading').classList.remove('active');}
+
+function renderEmotions(id, multi){
+  const c = document.getElementById(id);c.innerHTML = '';
+  EMOTIONS.forEach(e=>{
+    const d = document.createElement('div');d.className='em';d.dataset.key=e.key;
+    d.innerHTML = `<div class="em-svg">${e.svg}</div><div class="em-name">${e.name}</div>`;
+    d.onclick = ()=>{
+      if(multi){
+        d.classList.toggle('selected');
+        const sel = c.querySelectorAll('.em.selected');
+        if(sel.length>3){d.classList.remove('selected');return;}
+        state.data.task1_emotions = Array.from(sel).map(x=>x.dataset.key);
+        document.getElementById('t1-hint').textContent = `已選 ${sel.length} 個`+(sel.length<2?'（至少 2 個）':'');
+        document.getElementById('btn-task1-next').disabled = sel.length<2;
+      } else {
+        c.querySelectorAll('.em').forEach(x=>x.classList.remove('selected'));
+        d.classList.add('selected');
+        state.data.task2_current_emotion = e.key;
+        checkTask2aReady();
+      }
+    };
+    c.appendChild(d);
+  });
+}
+
+function selectActivity(el,type){
+  document.querySelectorAll('.act-btn').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');state.data.task2_activity_type=type;checkTask2aReady();
+}
+function checkTask2aReady(){
+  const text = document.getElementById('activity-text').value.trim();
+  document.getElementById('btn-task2a-next').disabled = !(state.data.task2_activity_type && state.data.task2_current_emotion && text.length>0);
+}
+
+function renderReasons(){
+  const c = document.getElementById('reasons-list');c.innerHTML='';
+  REASONS.forEach(r=>{
+    const d=document.createElement('div');d.className='reason';
+    d.innerHTML=`<div class="reason-cb"></div><div class="reason-label">${r.name}</div>`;
+    d.onclick=()=>{
+      d.classList.toggle('selected');
+      const sel = c.querySelectorAll('.reason.selected');
+      state.data.task2b_reasons = Array.from(sel).map(x=>{
+        const lbl = x.querySelector('.reason-label').textContent;
+        return REASONS.find(r=>r.name===lbl).key;
+      });
+    };
+    c.appendChild(d);
+  });
+}
+
+const SUS_Q = ['我想要經常使用此系統','我覺得此系統太複雜','我覺得此系統很容易使用','我需要他人協助才能使用此系統','我覺得系統各功能整合得很好','我覺得此系統前後不一致','我認為大多數人能很快學會使用此系統','我覺得此系統使用起來很麻煩','我使用此系統時很有信心','我需要學很多才能上手此系統'];
+function renderSUS(){
+  const c=document.getElementById('sus-content');c.innerHTML='';
+  SUS_Q.forEach((q,i)=>{
+    const card=document.createElement('div');card.className='q-card';
+    card.innerHTML=`<div class="q-num">SUS Q${i+1}</div><div class="q-text">${q}</div><div class="q-options">${[1,2,3,4,5].map(v=>`<div class="q-opt" onclick="selectSUS(${i},${v},this)">${v}</div>`).join('')}</div><div class="q-scale"><span>非常不同意</span><span>非常同意</span></div>`;
+    c.appendChild(card);
+  });
+  const btn=document.createElement('button');btn.className='btn';btn.id='btn-sus-next';btn.disabled=true;btn.textContent='下一份問卷';btn.onclick=completeSUS;c.appendChild(btn);
+}
+function selectSUS(i,v,el){
+  state.data.sus[i]=v;
+  el.parentElement.querySelectorAll('.q-opt').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-sus-next').disabled = state.data.sus.includes(null);
+}
+
+const UX_Q = [{d:'操作輕鬆度',t:'我能輕鬆完成今日情緒紀錄'},{d:'回顧便利度',t:'我能輕鬆回顧自己的紀錄'},{d:'情緒對照清晰度',t:'情緒與舒壓活動的對照清楚易懂'},{d:'AI 訊息清晰度',t:'AI 給我的回饋訊息清楚易懂'}];
+function renderUX(){
+  const c=document.getElementById('ux-content');c.innerHTML='';
+  UX_Q.forEach((q,i)=>{
+    const card=document.createElement('div');card.className='q-card';
+    card.innerHTML=`<div class="q-num">UX Q${i+1}</div><div class="q-title">${q.d}</div><div class="q-text">${q.t}</div><div class="q-options">${[1,2,3,4,5,6,7].map(v=>`<div class="q-opt" onclick="selectUX(${i},${v},this)">${v}</div>`).join('')}</div><div class="q-scale"><span>非常不同意</span><span>非常同意</span></div>`;
+    c.appendChild(card);
+  });
+  const btn=document.createElement('button');btn.className='btn';btn.id='btn-ux-next';btn.disabled=true;btn.textContent='下一份問卷';btn.onclick=completeUX;c.appendChild(btn);
+}
+function selectUX(i,v,el){
+  state.data.ux[i]=v;
+  el.parentElement.querySelectorAll('.q-opt').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-ux-next').disabled = state.data.ux.includes(null);
+}
+
+const AI_Q = [{d:'訊息符合度',t:'AI 的訊息符合我當下的需要'},{d:'訊息溫度感',t:'AI 的訊息讓我感受到被理解'},{d:'行動意願度',t:'我願意依照 AI 的訊息採取小行動'}];
+function renderAI(){
+  const c=document.getElementById('ai-content');c.innerHTML='';
+  AI_Q.forEach((q,i)=>{
+    const card=document.createElement('div');card.className='q-card';
+    card.innerHTML=`<div class="q-num">AI Q${i+1}</div><div class="q-title">${q.d}</div><div class="q-text">${q.t}</div><div class="q-options">${[1,2,3,4,5,6,7].map(v=>`<div class="q-opt" onclick="selectAI(${i},${v},this)">${v}</div>`).join('')}</div><div class="q-scale"><span>非常不同意</span><span>非常同意</span></div>`;
+    c.appendChild(card);
+  });
+  const btn=document.createElement('button');btn.className='btn';btn.id='btn-ai-next';btn.disabled=true;btn.textContent='完成';btn.onclick=completeAll;c.appendChild(btn);
+}
+function selectAI(i,v,el){
+  state.data.ai_acceptance[i]=v;
+  el.parentElement.querySelectorAll('.q-opt').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-ai-next').disabled = state.data.ai_acceptance.includes(null);
+}
+
+function renderAICard(){
+  const body = document.getElementById('ai-card-body');
+  const lastWeekText = state.data.task1_emotions.map(k=>EMO_BY_KEY[k].name).join('、');
+  const nowText = state.data.task2_current_emotion ? EMO_BY_KEY[state.data.task2_current_emotion].name : '';
+  const activityType = state.data.task2_activity_type === 'creation' ? '創作紀錄' : '行為紀錄';
+  const reasonsText = state.data.task2b_reasons.length>0 ? state.data.task2b_reasons.map(k=>REASONS.find(r=>r.key===k).name).join('、') : '未填';
+  if(CONDITION === 'A1B1'){
+    body.innerHTML = `
+      <div class="ai-row"><span class="ai-row-label">上週情緒</span><span class="ai-row-value">${lastWeekText}</span></div>
+      <div class="ai-row"><span class="ai-row-label">舒壓類別</span><span class="ai-row-value">${activityType}</span></div>
+      <div class="ai-row"><span class="ai-row-label">舒壓內容</span><span class="ai-row-value">${state.data.task2_activity_text}</span></div>
+      <div class="ai-row"><span class="ai-row-label">當前情緒</span><span class="ai-row-value">${nowText}</span></div>
+      <div class="ai-row"><span class="ai-row-label">困難指數</span><span class="ai-row-value">${state.data.task2b_difficulty} / 7</span></div>
+      <div class="ai-row"><span class="ai-row-label">影響領域</span><span class="ai-row-value">${reasonsText}</span></div>
+      ${state.data.task2b_diary ? `<div class="ai-row"><span class="ai-row-label">備註</span><span class="ai-row-value">${state.data.task2b_diary}</span></div>` : ''}
+      <div class="ai-status">紀錄已完成・系統已儲存</div>`;
+  } else {
+    body.innerHTML = `<div class="ai-row"><span>條件 ${CONDITION} 尚未實作</span></div>`;
+  }
+}
+
+let taskStarts = {};
+function startTask1(){taskStarts.task1=Date.now();showScreen('task1');}
+function completeTask1(){
+  const dur=Math.round((Date.now()-taskStarts.task1)/1000);
+  state.taskTimes.task1={started:new Date(taskStarts.task1).toISOString(),completed:new Date().toISOString(),duration:dur};
+  taskStarts.task2=Date.now();showScreen('task2a');
+}
+function goTask2b(){showScreen('task2b');}
+function completeTask2(){
+  state.data.task2b_diary = document.getElementById('diary-text').value.trim();
+  state.data.task2b_difficulty = parseInt(document.getElementById('diff-slider').value);
+  state.data.task2_activity_text = document.getElementById('activity-text').value.trim();
+  const dur=Math.round((Date.now()-taskStarts.task2)/1000);
+  state.taskTimes.task2={started:new Date(taskStarts.task2).toISOString(),completed:new Date().toISOString(),duration:dur};
+  taskStarts.task3=Date.now();renderAICard();showScreen('task3');
+}
+async function completeTask3(){
+  const dur=Math.round((Date.now()-taskStarts.task3)/1000);
+  state.taskTimes.task3={started:new Date(taskStarts.task3).toISOString(),completed:new Date().toISOString(),duration:dur};
+  await saveProgress();showScreen('sus');
+}
+function completeSUS(){showScreen('ux');}
+function completeUX(){showScreen('ai-accept');}
+async function completeAll(){
+  await saveFinal();
+  document.getElementById('thanks-id').textContent = `編號：${state.participantId}`;
+  showScreen('thanks');
+}
+
+function calcSUS(){
+  const r=state.data.sus;if(r.includes(null))return null;
+  let total=0;
+  for(let i=0;i<10;i++){if(i%2===0)total+=(r[i]-1);else total+=(5-r[i]);}
+  return total*2.5;
+}
+
+// ====== AUTO-INIT: 用 fetch 直接 INSERT ======
+async function autoInit(){
+  const errEl = document.getElementById('init-error');
+  const btn = document.getElementById('btn-start');
+  const pidDisplay = document.getElementById('pid-display');
+  
+  // 直接用時間戳記產生 ID（保證能配出來）
+  const now = new Date();
+  const stamp = `${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+  const rand = Math.random().toString(36).substring(2,5).toUpperCase();
+  const participantId = `T_${stamp}_${rand}`;
+  
+  state.participantId = participantId;
+  
+  // 寫入受試者紀錄
+  try{
+    await sbInsert('participants', {
+      id: participantId,
+      participant_code: 'auto',
+      condition: CONDITION,
+      session_id: SESSION_ID,
+      status: 'in_progress'
+    });
+    
+    // 成功
+    pidDisplay.textContent = `${participantId.substring(0,8)}… · ${CONDITION} · ${SESSION_ID}`;
+    btn.textContent = '開始任務 1';
+    btn.disabled = false;
+  } catch(e){
+    console.error('Insert failed:', e);
+    pidDisplay.textContent = `❌ 連線失敗`;
+    pidDisplay.style.background = '#FBE8DA';
+    pidDisplay.style.color = '#B26B4A';
+    errEl.style.display = 'block';
+    errEl.innerHTML = `<strong>⚠️ 無法連接到資料庫</strong><br>請聯絡研究人員。錯誤：<code>${e.message || JSON.stringify(e)}</code>`;
+    btn.textContent = '無法繼續';
+    btn.disabled = true;
+  }
+}
+
+async function saveProgress(){
+  showLoading('儲存中...');
+  try{
+    const upd = {
+      task1_started_at: state.taskTimes.task1.started,
+      task1_completed_at: state.taskTimes.task1.completed,
+      task1_duration_seconds: state.taskTimes.task1.duration,
+      task1_emotions: state.data.task1_emotions,
+      task2_started_at: state.taskTimes.task2.started,
+      task2_completed_at: state.taskTimes.task2.completed,
+      task2_duration_seconds: state.taskTimes.task2.duration,
+      task2_activity_type: state.data.task2_activity_type,
+      task2_activity_text: state.data.task2_activity_text,
+      task2_current_emotion: state.data.task2_current_emotion,
+      task2b_diary: state.data.task2b_diary,
+      task2b_reasons: state.data.task2b_reasons,
+      task2b_difficulty: state.data.task2b_difficulty,
+      task3_started_at: state.taskTimes.task3.started,
+      task3_completed_at: state.taskTimes.task3.completed,
+      task3_duration_seconds: state.taskTimes.task3.duration,
+    };
+    await sbUpdate('participants', 'id', state.participantId, upd);
+  }catch(e){console.error('saveProgress error',e);}
+  hideLoading();
+}
+
+async function saveFinal(){
+  showLoading('儲存中...');
+  try{
+    const upd = {
+      sus_responses: state.data.sus,
+      sus_total: calcSUS(),
+      ux_responses: state.data.ux,
+      ai_acceptance_responses: state.data.ai_acceptance,
+      completed_at: new Date().toISOString(),
+      status: 'completed'
+    };
+    await sbUpdate('participants', 'id', state.participantId, upd);
+  }catch(e){console.error('saveFinal error',e);}
+  hideLoading();
+}
+
+// 初始化
+renderEmotions('emotions-task1', true);
+renderEmotions('emotions-now', false);
+renderReasons();
+renderSUS();
+renderUX();
+renderAI();
+document.getElementById('activity-text').addEventListener('input', checkTask2aReady);
+autoInit();
+</script>
+
+</body>
+</html>
