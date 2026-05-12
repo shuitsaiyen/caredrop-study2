@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心滴 CareDrop · 使用者測試</title>
+<style>
+/* === 這裡保留你 a1b2.html 原本的所有樣式 === */
+@import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{--bg:#F5EFDF;--bg2:#EBE3CC;--main:#6A9B8B;--light:#A8C8BD;--dark:#4F7C70;--darker:#2E5249;--text:#2A3520;--text2:#6B7558;--white:#FBF6E9;--card:#FFFCF1;--shadow:0 4px 16px rgba(40,70,60,0.10);--font-hand:'LXGW WenKai TC',serif;--font-ui:'Noto Sans TC',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{font-family:var(--font-ui);background:#E5DDC3;min-height:100vh;color:var(--text);}
+body{display:flex;justify-content:center;}
+.app{width:100%;max-width:480px;min-height:100vh;background:var(--bg);position:relative;overflow-x:hidden;}
+.screen{display:none;flex-direction:column;min-height:100vh;padding:0 0 100px;animation:fadeIn .3s;}
+.screen.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.header{padding:28px 24px 12px;background:var(--white);}
+.h-title{font-family:var(--font-hand);font-size:24px;font-weight:700;color:var(--text);}
+.h-sub{font-size:14px;color:var(--text2);margin-top:6px;line-height:1.6;}
+.h-pid{display:inline-block;margin-top:8px;padding:3px 10px;background:var(--bg);color:var(--darker);font-size:12px;font-family:var(--font-hand);border-radius:10px;font-weight:700;}
+.content{padding:20px 24px;flex:1;}
+.btn{background:var(--dark);color:white;border:none;border-radius:22px;padding:16px;width:100%;font-size:17px;font-weight:700;font-family:var(--font-ui);cursor:pointer;margin-top:12px;}
+.btn:active{transform:scale(0.98);}
+.progress{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:3px;background:var(--bg2);z-index:100;}
+.progress-bar{height:100%;background:var(--main);transition:width .3s;}
+
+/* ==================== A2B1 教練版專用樣式 ==================== */
+.coach-screen { background: white; border-radius: 32px; box-shadow: 0 10px 40px rgba(92,120,73,0.25); overflow: hidden; margin: 20px 16px; }
+.coach-header { background: linear-gradient(135deg, #5C7849, #8AA67A); color: white; padding: 30px 24px; text-align: center; }
+.coach-badge { background: #FFD700; color: #333; padding: 8px 20px; border-radius: 30px; font-weight: 700; display: inline-block; margin-bottom: 12px; }
+.quadrant-box { background: #F8F9F0; border: 4px solid #5C7849; border-radius: 24px; height: 280px; position: relative; margin: 24px 16px; }
+.quad-label { position: absolute; font-weight: 700; color: #5C7849; font-size: 15px; }
+.pin { position: absolute; font-size: 68px; top: 50%; left: 50%; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3)); }
+.coach-tips { padding: 0 24px 30px; }
+.coach-tips h3 { color: #5C7849; margin: 10px 0 16px; text-align: center; }
+.coach-footer { background: #5C7849; color: white; padding: 28px 24px; text-align: center; font-size: 17px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-bar" id="progress-bar" style="width:0%;"></div></div>
+<div class="app">
+
+<!-- 下面保留你原本 a1b2.html 的所有 screen（intro ~ task2b） -->
+<!-- 為了簡潔我這裡省略，但你貼的時候要保留原本內容 -->
+
+<div class="screen" id="screen-task3">
+  <div class="header">
+    <div class="h-title">任務 3</div>
+    <div class="h-sub">教練回饋</div>
+  </div>
+  <div class="content">
+    <div class="coach-screen">
+      <div class="coach-header">
+        <div class="coach-badge">🏆 關卡完成！</div>
+        <h2>心滴・教練</h2>
+        <p>你今天做得很好，讓我們一起規劃下一步</p>
+      </div>
+
+      <div class="quadrant-box">
+        <div class="quad-label" style="top:25px;left:30px;">舒適區</div>
+        <div class="quad-label" style="top:25px;right:30px;">成長區</div>
+        <div class="quad-label" style="bottom:25px;left:30px;">需要照顧區</div>
+        <div class="quad-label" style="bottom:25px;right:30px;">挑戰區</div>
+        <div class="pin">📍</div>
+      </div>
+
+      <div class="coach-tips">
+        <h3>教練行動建議</h3>
+        <ol style="line-height:2.1; font-size:16.5px; padding-left:20px;">
+          <li><strong>延長創作時間</strong> 到 30 分鐘以上</li>
+          <li>下次試試新色系，挑戰自己</li>
+          <li>為這張作品取一個名字，留下紀念</li>
+        </ol>
+      </div>
+
+      <div class="coach-footer">
+        🌱 下一關已解鎖！<br>一週內再記錄，就能看到完整情緒趨勢圖
+      </div>
+    </div>
+
+    <button class="btn" onclick="completeTask3()" style="margin-top:30px;">完成測試</button>
+  </div>
+</div>
+
+<!-- 感謝頁面保留 -->
+<div class="screen" id="screen-thanks">
+  <!-- 你原本的 thanks 內容 -->
+</div>
+
+</div>
+
+<script>
+// 把你 a1b2.html 原本的全部 <script> 內容貼在這裡
+// （包含 autoInit、saveProgress 等所有 function）
+</script>
+
+</body>
+</html>
