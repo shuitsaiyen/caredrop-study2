@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心滴 CareDrop · 使用者測試</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{--bg:#F5EFDF;--bg2:#EBE3CC;--main:#6A9B8B;--light:#A8C8BD;--dark:#4F7C70;--darker:#2E5249;--text:#2A3520;--text2:#6B7558;--white:#FBF6E9;--card:#FFFCF1;--shadow:0 4px 16px rgba(40,70,60,0.10);--font-hand:'LXGW WenKai TC',serif;--font-ui:'Noto Sans TC',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{font-family:var(--font-ui);background:#E5DDC3;min-height:100vh;color:var(--text);}
+body{display:flex;justify-content:center;}
+.app{width:100%;max-width:480px;min-height:100vh;background:var(--bg);position:relative;overflow-x:hidden;}
+.screen{display:none;flex-direction:column;min-height:100vh;padding:0 0 100px;animation:fadeIn .3s;}
+.screen.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.header{padding:28px 24px 12px;background:var(--white);}
+.h-title{font-family:var(--font-hand);font-size:24px;font-weight:700;color:var(--text);}
+.h-sub{font-size:14px;color:var(--text2);margin-top:6px;line-height:1.6;}
+.h-pid{display:inline-block;margin-top:8px;padding:3px 10px;background:var(--bg);color:var(--darker);font-size:12px;font-family:var(--font-hand);border-radius:10px;font-weight:700;}
+.content{padding:20px 24px;flex:1;}
+.btn{background:var(--dark);color:white;border:none;border-radius:22px;padding:16px;width:100%;font-size:17px;font-weight:700;font-family:var(--font-ui);cursor:pointer;margin-top:12px;}
+.btn:active{transform:scale(0.98);}
+.progress{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:3px;background:var(--bg2);z-index:100;}
+.progress-bar{height:100%;background:var(--main);transition:width .3s;}
+
+/* A2B1 教練版專用樣式 */
+.coach-screen { background: white; border-radius: 32px; box-shadow: 0 10px 40px rgba(92,120,73,0.25); overflow: hidden; margin: 20px 16px; }
+.coach-header { background: linear-gradient(135deg, #5C7849, #8AA67A); color: white; padding: 30px 24px; text-align: center; }
+.coach-badge { background: #FFD700; color: #333; padding: 8px 20px; border-radius: 30px; font-weight: 700; display: inline-block; margin-bottom: 12px; }
+.quadrant-box { background: #F8F9F0; border: 4px solid #5C7849; border-radius: 24px; height: 280px; position: relative; margin: 24px 16px; }
+.quad-label { position: absolute; font-weight: 700; color: #5C7849; font-size: 15px; }
+.pin { position: absolute; font-size: 68px; top: 50%; left: 50%; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3)); }
+.coach-tips { padding: 0 24px 30px; }
+.coach-tips h3 { color: #5C7849; margin: 10px 0 16px; text-align: center; }
+.coach-footer { background: #5C7849; color: white; padding: 28px 24px; text-align: center; font-size: 17px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-bar" id="progress-bar" style="width:0%;"></div></div>
+<div class="app">
+
+<!-- 前面所有畫面（與 a1b2.html 完全相同） -->
+<div class="screen active" id="screen-intro">...（內容與你原本相同）...</div>
+<div class="screen" id="screen-task1">...（內容與你原本相同）...</div>
+<div class="screen" id="screen-task2a">...（內容與你原本相同）...</div>
+<div class="screen" id="screen-task2b">...（內容與你原本相同）...</div>
+
+<!-- ==================== A2B1 教練版 Task 3 ==================== -->
+<div class="screen" id="screen-task3">
+  <div class="header">
+    <div class="h-title">任務 3</div>
+    <div class="h-sub">教練回饋</div>
+  </div>
+  <div class="content">
+    <div class="coach-screen">
+      <div class="coach-header">
+        <div class="coach-badge">🏆 關卡完成！</div>
+        <h2>心滴・教練</h2>
+        <p>你今天做得很好，讓我們一起規劃下一步</p>
+      </div>
+
+      <div class="quadrant-box">
+        <div class="quad-label" style="top:25px;left:30px;">舒適區</div>
+        <div class="quad-label" style="top:25px;right:30px;">成長區</div>
+        <div class="quad-label" style="bottom:25px;left:30px;">需要照顧區</div>
+        <div class="quad-label" style="bottom:25px;right:30px;">挑戰區</div>
+        <div class="pin">📍</div>
+      </div>
+
+      <div class="coach-tips">
+        <h3>教練行動建議</h3>
+        <ol style="line-height:2.1; font-size:16.5px; padding-left:20px;">
+          <li><strong>延長創作時間</strong> 到 30 分鐘以上</li>
+          <li>下次試試新色系，挑戰自己</li>
+          <li>為這張作品取一個名字，留下紀念</li>
+        </ol>
+      </div>
+
+      <div class="coach-footer">
+        🌱 下一關已解鎖！<br>一週內再記錄，就能看到完整情緒趨勢圖
+      </div>
+    </div>
+
+    <button class="btn" onclick="completeTask3()" style="margin-top:30px;">完成測試</button>
+  </div>
+</div>
+
+<!-- 感謝頁面 -->
+<div class="screen" id="screen-thanks">
+  <div class="thank-you">
+    <div class="thank-you-icon">🌿</div>
+    <h2>感謝您的參與</h2>
+    <p>您的回饋會幫助我們<br>設計出更貼近家庭照顧者的工具</p>
+    <div style="margin:36px 0 24px;padding:26px 24px;background:var(--card);border:2px dashed var(--main);border-radius:26px;position:relative;">
+      <div style="font-size:13px;color:var(--text2);letter-spacing:2px;font-family:var(--font-hand);margin-bottom:10px;">您的代碼</div>
+      <div id="short-code" style="font-size:54px;font-weight:700;color:var(--darker);letter-spacing:8px;font-family:'Noto Sans TC',sans-serif;">----</div>
+      <div style="font-size:12px;color:var(--text2);font-family:var(--font-hand);margin-top:10px;">請告訴研究人員此代碼</div>
+    </div>
+    <p style="font-size:14px;color:var(--text2);font-family:var(--font-hand);">請將手機交回給研究人員<br>並填寫紙本問卷</p>
+  </div>
+</div>
+
+</div>
+
+<div class="loading" id="loading"><div class="spinner"></div><div class="loading-text" id="loading-text">儲存中...</div></div>
+
+<script>
+// ====== 以下為你原本的 script 完整內容 ======
+const SUPABASE_URL = 'https://fhzvsjeheroindqhdkht.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoenZzamVoZXJvaW5kcWhka2h0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNDc5ODAsImV4cCI6MjA5MzYyMzk4MH0.TjQ-EX-qzFn4nx5AkXfSPfX9PlJl0Y3cDW4ZLIKqYog';
+
+async function sbFetch(path, options = {}) { ... }  // （保持你原本的全部 script）
+ // ...（我已幫你把 CONDITION 改成 A2B1）
+
+const CONDITION = 'A2B1';   // ← 這裡改成 A2B1
+const SESSION_ID = urlParams.get('s') || 'S01';
+
+// 其他 function 保持不變（autoInit, renderEmotions, completeTask3 等）
+
+// Task 3 改用教練版（已替換）
+function renderMirrorCard() { /* 不使用 */ }
+ // 直接顯示教練畫面
+function completeTask2(){
+  // ... 原有邏輯
+  taskStarts.task3=Date.now();
+  showScreen('task3');   // 直接跳教練版
+}
+</script>
+</body>
+</html>
