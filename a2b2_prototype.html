@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心滴 CareDrop · 使用者測試</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{--bg:#FDF1F1;--bg2:#FBE0E6;--main:#E89BAA;--light:#F8D4DD;--dark:#B5677F;--darker:#7D3F52;--heart:#D9789A;--cream:#FFFCFA;--text:#4A2F37;--text2:#85636B;--white:#FFF8F8;--card:#FFFFFF;--shadow:0 4px 16px rgba(181,103,127,0.10);--font-hand:'LXGW WenKai TC',serif;--font-ui:'Noto Sans TC',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{font-family:var(--font-ui);background:#EDD7DA;min-height:100vh;color:var(--text);}
+body{display:flex;justify-content:center;}
+.app{width:100%;max-width:480px;min-height:100vh;background:var(--bg);position:relative;overflow-x:hidden;}
+.screen{display:none;flex-direction:column;min-height:100vh;padding:0 0 100px;animation:fadeIn .3s;}
+.screen.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.header{padding:28px 24px 12px;background:var(--white);}
+.h-title{font-family:var(--font-hand);font-size:24px;font-weight:700;color:var(--text);}
+.h-sub{font-size:14px;color:var(--text2);margin-top:6px;line-height:1.6;}
+.h-pid{display:inline-block;margin-top:8px;padding:3px 10px;background:var(--bg);color:var(--darker);font-size:12px;font-family:var(--font-hand);border-radius:10px;font-weight:700;}
+.content{padding:20px 24px;flex:1;}
+.btn{background:var(--dark);color:white;border:none;border-radius:18px;padding:16px;width:100%;font-size:17px;font-weight:700;font-family:var(--font-ui);cursor:pointer;margin-top:12px;}
+.btn:active{transform:scale(0.98);}
+.btn:disabled{background:#C9B3B7;cursor:not-allowed;}
+.input{width:100%;padding:16px;font-size:17px;font-family:var(--font-ui);background:var(--white);border:1.5px solid var(--bg2);border-radius:16px;margin-top:8px;}
+.input:focus{outline:none;border-color:var(--main);}
+textarea.input{resize:vertical;min-height:80px;font-family:var(--font-hand);font-size:16px;line-height:1.7;}
+.label{font-size:14px;color:var(--text2);font-weight:600;margin-top:18px;margin-bottom:6px;display:block;}
+.emotions{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px;}
+.em{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;background:var(--card);border:2px solid transparent;border-radius:18px;cursor:pointer;}
+.em:active{transform:scale(0.95);}
+.em.selected{background:var(--bg2);border-color:var(--main);}
+.em-svg{width:38px;height:46px;}
+.em-svg svg{width:100%;height:100%;display:block;}
+.em-name{font-family:var(--font-hand);font-size:13px;font-weight:600;color:var(--text);}
+.hint{font-size:13px;color:var(--text2);margin-top:8px;font-family:var(--font-hand);}
+.activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+.act-btn{padding:20px 12px;background:var(--card);border:2px solid var(--bg2);border-radius:20px;font-family:var(--font-hand);font-size:16px;font-weight:600;color:var(--text);cursor:pointer;text-align:center;}
+.act-btn:active{transform:scale(0.97);}
+.act-btn.selected{background:var(--bg2);border-color:var(--main);color:var(--darker);}
+.act-icon{font-size:28px;display:block;margin-bottom:6px;}
+.reasons{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.reason{display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border:1.5px solid var(--bg2);border-radius:14px;cursor:pointer;}
+.reason.selected{background:var(--bg2);border-color:var(--main);}
+.reason-cb{width:22px;height:22px;border:2px solid var(--main);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:white;}
+.reason.selected .reason-cb{background:var(--dark);}
+.reason.selected .reason-cb::after{content:"✓";color:white;font-weight:700;font-size:14px;}
+.reason-label{font-size:15px;color:var(--text);}
+.slider-row{margin-top:12px;}
+.slider{width:100%;-webkit-appearance:none;height:6px;background:var(--bg2);border-radius:3px;outline:none;}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;background:var(--dark);border-radius:50%;cursor:pointer;border:3px solid white;box-shadow:0 2px 6px rgba(181,103,127,0.20);}
+.slider-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:6px;}
+.slider-value{text-align:center;font-family:var(--font-hand);font-size:32px;font-weight:700;color:var(--dark);margin-top:8px;}
+
+/* ====== 小助理卡（A2B2 心滴・小助理）====== */
+.helper-card{margin:18px 0;padding:24px 22px 28px;background:linear-gradient(155deg,#FFF8FA 0%,#FCEAEF 50%,#FFE4EC 100%);border-radius:32px;box-shadow:0 8px 30px rgba(181,103,127,0.12);position:relative;overflow:hidden;}
+.helper-card::before{content:'';position:absolute;top:-30px;left:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(217,120,154,0.18) 0%,rgba(217,120,154,0.04) 60%,transparent 100%);pointer-events:none;border-radius:50%;}
+.helper-card::after{content:'';position:absolute;bottom:-40px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(232,155,170,0.16) 0%,rgba(232,155,170,0.04) 60%,transparent 100%);pointer-events:none;border-radius:50%;}
+
+.helper-badge{display:inline-flex;align-items:center;gap:6px;background:white;color:var(--darker);padding:6px 14px;border-radius:20px;font-family:var(--font-hand);font-size:13px;font-weight:700;letter-spacing:1.5px;position:relative;z-index:2;box-shadow:0 2px 8px rgba(181,103,127,0.10);}
+.helper-badge .h-icon{font-size:13px;color:var(--heart);}
+
+.helper-avatar-wrap{display:flex;justify-content:center;margin:14px 0 8px;position:relative;z-index:2;}
+.helper-avatar{width:80px;height:96px;animation:avatarBob 3.5s ease-in-out infinite;}
+@keyframes avatarBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+.helper-tail{display:block;margin:0 auto;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:14px solid white;position:relative;z-index:2;margin-top:-4px;filter:drop-shadow(0 2px 4px rgba(181,103,127,0.10));}
+
+.heart-frame{background:white;border-radius:26px;padding:32px 24px 30px;margin-top:0;position:relative;box-shadow:0 4px 14px rgba(181,103,127,0.08);z-index:1;border:1.5px solid rgba(232,155,170,0.30);}
+.heart-frame::before,.heart-frame::after{content:'♡';position:absolute;color:var(--heart);opacity:0.22;font-size:22px;}
+.heart-frame::before{top:14px;left:18px;}
+.heart-frame::after{bottom:14px;right:18px;}
+
+.floating-drops{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:26px;}
+.floating-drop{position:absolute;font-size:14px;opacity:0.55;}
+.fd-1{top:18px;right:28px;color:#A8C9DC;animation:dropFloat 4s ease-in-out infinite;}
+.fd-2{top:40%;left:14px;color:#D9789A;font-size:12px;animation:dropFloat 5s ease-in-out infinite reverse;}
+.fd-3{bottom:30%;right:18px;color:#A8C9DC;font-size:12px;animation:dropFloat 4.5s ease-in-out infinite;}
+.fd-4{bottom:22px;left:26px;color:#D9789A;animation:dropFloat 5.5s ease-in-out infinite reverse;}
+.fd-5{top:30%;right:50%;color:#E89BAA;font-size:10px;opacity:0.4;animation:dropFloat 6s ease-in-out infinite;}
+@keyframes dropFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+
+.speech-text{position:relative;z-index:2;text-align:center;font-family:var(--font-hand);font-size:17px;line-height:2.1;color:var(--text);letter-spacing:1.5px;}
+.speech-text .block{margin-bottom:14px;}
+.speech-text .block:last-child{margin-bottom:0;}
+.speech-text .block.affirm{color:var(--darker);font-weight:700;}
+.speech-text .block.mirror{color:var(--text2);}
+.speech-text .block.invite{color:var(--dark);}
+.speech-text .block.closing{color:var(--text);}
+.speech-text .heart-inline{color:var(--heart);font-size:15px;}
+
+.progress{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:3px;background:var(--bg2);z-index:100;}
+.progress-bar{height:100%;background:var(--main);transition:width .3s;}
+.thank-you{text-align:center;padding:60px 30px;}
+.thank-you-icon{font-size:64px;margin-bottom:20px;}
+.thank-you h2{font-family:var(--font-hand);font-size:28px;color:var(--darker);margin-bottom:14px;}
+.thank-you p{font-size:15px;color:var(--text2);line-height:1.8;}
+.error-box{background:#FBE8DA;color:#B26B4A;padding:14px;border-radius:10px;font-size:14px;margin-top:12px;border-left:3px solid #B26B4A;}
+.error-box code{display:block;margin-top:6px;background:white;padding:8px;border-radius:6px;font-size:11px;word-break:break-all;font-family:monospace;}
+.loading{position:fixed;inset:0;background:rgba(253,241,241,0.92);display:none;align-items:center;justify-content:center;z-index:200;flex-direction:column;gap:16px;}
+.loading.active{display:flex;}
+.spinner{width:48px;height:48px;border:4px solid var(--bg2);border-top-color:var(--dark);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-family:var(--font-hand);color:var(--text2);font-size:14px;}
+
+/* 進入畫面：愛心 + 漂浮的水滴 */
+.intro-heart{text-align:center;margin:40px 0 8px;position:relative;height:96px;}
+.intro-heart-emoji{font-size:56px;display:inline-block;position:relative;z-index:2;animation:heartGlow 3.5s ease-in-out infinite;}
+@keyframes heartGlow{0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(217,120,154,0.3));}50%{transform:scale(1.05);filter:drop-shadow(0 0 18px rgba(217,120,154,0.55));}}
+.intro-welcome{text-align:center;font-family:var(--font-hand);font-size:19px;line-height:2;margin:18px 0 30px;color:var(--text);letter-spacing:1px;}
+.intro-tasks{font-family:var(--font-hand);font-size:14px;line-height:2.1;margin-bottom:22px;padding:16px 18px;background:var(--card);border-radius:18px;border-left:3px solid var(--main);}
+.intro-note{font-size:13px;color:var(--text2);line-height:1.8;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-bar" id="progress-bar" style="width:0%;"></div></div>
+
+<div class="app">
+<div class="screen active" id="screen-consent">
+  <div class="header">
+    <div class="h-title">參與說明</div>
+    <div class="h-sub">心滴 CareDrop · 匿名測試</div>
+  </div>
+  <div class="content">
+    <p style="font-size:15px;color:var(--text);line-height:1.85;margin-bottom:18px;">
+      您好，感謝您參與本研究。這是一份關於照顧者情緒記錄工具的匿名測試，約需 10–15 分鐘。
+    </p>
+    <div style="background:var(--card);border-radius:18px;padding:6px 18px;margin-bottom:18px;box-shadow:var(--shadow);">
+      <div style="font-size:14px;color:var(--text);padding:13px 0;border-bottom:1px solid var(--bg2);line-height:1.75;">
+        我們<b style="color:var(--dark);">不會</b>收集您的姓名、電話或任何身分資料，所有回應以匿名代碼處理
+      </div>
+      <div style="font-size:14px;color:var(--text);padding:13px 0;border-bottom:1px solid var(--bg2);line-height:1.75;">
+        參與本研究<b style="color:var(--dark);">完全出於自願</b>，不會影響您在這裡的任何安排
+      </div>
+      <div style="font-size:14px;color:var(--text);padding:13px 0;line-height:1.75;">
+        上傳作品照片時，請僅拍攝<b style="color:var(--dark);">作品本身</b>，避免拍到人臉或個人資訊
+      </div>
+    </div>
+    <div style="background:var(--bg);border-radius:14px;padding:14px 16px;font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:20px;">
+      若填答過程中感到任何不適，<b style="color:var(--dark);">現場皆有社工或課程帶領者</b>可提供協助。
+    </div>
+    <p style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:20px;">
+      研究主持人：陳建雄 教授（台科大設計系）
+    </p>
+    <label style="display:flex;align-items:flex-start;gap:11px;background:var(--bg2);border-radius:16px;padding:16px;cursor:pointer;">
+      <input type="checkbox" id="consentChk" onchange="syncConsent()" style="width:20px;height:20px;margin-top:2px;accent-color:var(--main);flex-shrink:0;cursor:pointer;">
+      <span style="font-size:14.5px;font-weight:700;color:var(--text);line-height:1.6;">我已閱讀以上說明，自願參與本匿名研究</span>
+    </label>
+    <button class="btn" id="consentBtn" disabled onclick="acceptConsent()" style="margin-top:16px;">開始</button>
+    <p style="text-align:center;font-size:11px;color:var(--text2);margin-top:14px;opacity:0.65;">— 原型測試版 · A2B2 —</p>
+  </div>
+</div>
+
+
+<div class="screen" id="screen-intro">
+  <div class="header">
+    <div class="h-title">心滴 CareDrop</div>
+    <div class="h-sub">使用者測試</div>
+    <div class="h-pid" id="pid-display">配發中...</div>
+  </div>
+  <div class="content">
+    <div class="intro-heart">
+      <span class="intro-heart-emoji">💗</span>
+    </div>
+    <p class="intro-welcome">歡迎參與本研究<br>有人在這裡<br>陪你走一段</p>
+    <p style="font-family:var(--font-hand);font-size:15px;line-height:2;margin-bottom:8px;">接下來會經過 3 個小任務：</p>
+    <div class="intro-tasks">
+      1　回想上週的感受<br>
+      2　記下這週的舒壓<br>
+      3　收一份來自心滴的話
+    </div>
+    <p class="intro-note">測試過程中沒有正確答案，<br>請依您真實的感受體驗。</p>
+    <div id="init-error" class="error-box" style="display:none;"></div>
+    <button class="btn" id="btn-start" onclick="startTask1()" disabled>準備中…</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-task1">
+  <div class="header"><div class="h-title">任務 1</div><div class="h-sub">回想上週，你經歷了哪些感受？</div></div>
+  <div class="content">
+    <span class="label">請選 2-3 個（至少 2 個）</span>
+    <div class="emotions" id="emotions-task1"></div>
+    <div class="hint" id="t1-hint">已選 0 個</div>
+    <button class="btn" id="btn-task1-next" disabled onclick="completeTask1()">下一步</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-task2a">
+  <div class="header"><div class="h-title">任務 2</div><div class="h-sub">這週你做了什麼舒壓?</div></div>
+  <div class="content">
+    <span class="label">類別</span>
+    <div class="activity-grid">
+      <div class="act-btn" data-type="behavior" onclick="selectActivity(this,'behavior')"><span class="act-icon">🚶</span>行為紀錄</div>
+      <div class="act-btn" data-type="creation" onclick="selectActivity(this,'creation')"><span class="act-icon">🎨</span>創作紀錄</div>
+    </div>
+    <span class="label">請描述你的活動或作品（簡短即可）</span>
+    <textarea id="activity-text" class="input" placeholder="例如：和諧粉彩、捲紙、散步、聽音樂..." maxlength="200"></textarea>
+    <span class="label">上傳作品照片（選填）</span>
+    <input type="file" id="photo-input" accept="image/*" style="display:none;">
+    <button type="button" class="btn" style="background:#FFF8F8;color:var(--dark);border:2px dashed var(--main);margin-top:8px;" onclick="document.getElementById('photo-input').click()">📷 拍照 / 從相簿選擇</button>
+    <img id="photo-preview" style="display:none;width:100%;max-height:240px;object-fit:cover;border-radius:14px;margin-top:10px;">
+    <div id="photo-status" style="display:none;font-size:13px;color:var(--text2);font-family:var(--font-hand);margin-top:6px;text-align:center;"></div>
+    <span class="label">完成這個活動後，現在感覺如何？</span>
+    <div class="emotions" id="emotions-now"></div>
+    <button class="btn" id="btn-task2a-next" disabled onclick="goTask2b()">下一步</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-task2b">
+  <div class="header"><div class="h-title">任務 2 · 補充</div><div class="h-sub">幫助你看見自己（可全部跳過）</div></div>
+  <div class="content">
+    <span class="label">想記下的話（選填，20 字內）</span>
+    <textarea id="diary-text" class="input" placeholder="今天想說的一句話..." maxlength="20"></textarea>
+    <span class="label">是什麼讓心情這樣？（可複選）</span>
+    <div class="reasons" id="reasons-list"></div>
+    <span class="label">今天照顧家人的感覺</span>
+    <div class="slider-row">
+      <div class="slider-value" id="diff-value">4</div>
+      <input type="range" min="1" max="7" value="4" class="slider" id="diff-slider" oninput="document.getElementById('diff-value').textContent=this.value;">
+      <div class="slider-labels"><span>輕鬆 1</span><span>困難 7</span></div>
+    </div>
+    <button class="btn" onclick="completeTask2()">下一步</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-task3">
+  <div class="header"><div class="h-title">任務 3</div><div class="h-sub">來自心滴・小助理</div></div>
+  <div class="content">
+    <div class="helper-card" id="helper-card"></div>
+    <button class="btn" onclick="completeTask3()">完成測試</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-thanks">
+  <div class="thank-you">
+    <div class="thank-you-icon">💗</div>
+    <h2>感謝您的參與</h2>
+    <p>您的回饋會幫助我們<br>設計出更貼近家庭照顧者的工具</p>
+    <div style="margin:36px 0 24px;padding:24px;background:var(--card);border:2px dashed var(--main);border-radius:18px;">
+      <div style="font-size:13px;color:var(--text2);letter-spacing:2px;font-family:var(--font-hand);margin-bottom:8px;">您的代碼</div>
+      <div id="short-code" style="font-size:54px;font-weight:700;color:var(--darker);letter-spacing:8px;font-family:'Noto Sans TC',sans-serif;">----</div>
+      <div style="font-size:12px;color:var(--text2);font-family:var(--font-hand);margin-top:10px;">請告訴研究人員此代碼</div>
+    </div>
+    <p style="font-size:14px;color:var(--text2);font-family:var(--font-hand);">請將手機交回給研究人員<br>並填寫紙本問卷</p>
+  </div>
+</div>
+
+</div>
+
+<div class="loading" id="loading"><div class="spinner"></div><div class="loading-text" id="loading-text">儲存中...</div></div>
+
+<script>
+// ====== Supabase（與 A1B1/A1B2/A2B1 共用同一後台）======
+const SUPABASE_URL = 'https://fhzvsjeheroindqhdkht.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoenZzamVoZXJvaW5kcWhka2h0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNDc5ODAsImV4cCI6MjA5MzYyMzk4MH0.TjQ-EX-qzFn4nx5AkXfSPfX9PlJl0Y3cDW4ZLIKqYog';
+
+async function sbFetch(path, options = {}) {
+  const url = SUPABASE_URL + '/rest/v1' + path;
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...(options.headers || {})
+    }
+  });
+  if (!res.ok) { const txt = await res.text(); throw new Error(`${res.status} ${txt}`); }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+async function sbInsert(table, data) { return sbFetch('/' + table, {method:'POST', body: JSON.stringify(data)}); }
+async function sbUpdate(table, idCol, idVal, data) { return sbFetch(`/${table}?${idCol}=eq.${encodeURIComponent(idVal)}`, {method:'PATCH', body: JSON.stringify(data)}); }
+
+// ====== A2B2 鎖死 condition ======
+const urlParams = new URLSearchParams(window.location.search);
+const CONDITION = 'A2B2';
+const SESSION_ID = urlParams.get('s') || 'S01';
+
+const EMOTIONS = [
+  {key:'calm',name:'平靜',valence:1,svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#C8DDC0" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -10,2 Q -7,5 -4,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,2 Q 7,5 10,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M -6,18 Q 0,21 6,18" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/></svg>'},
+  {key:'relaxed',name:'放鬆',valence:1,svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#F5DBB0" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -12,2 Q -8,-2 -4,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,2 Q 8,-2 12,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M -8,16 Q 0,24 8,16" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/></svg>'},
+  {key:'tired',name:'疲累',valence:-1,svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#E5C9B0" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -12,4 L -4,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,2 L 12,4" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M -7,20 Q 0,18 7,20" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/></svg>'},
+  {key:'worried',name:'擔心',valence:-1,svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#D4D8E0" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -12,-2 L -4,2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,2 L 12,-2" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><circle cx="0" cy="20" r="2.2" fill="#3a4530"/></svg>'},
+  {key:'sad',name:'難過',valence:-1,svg:'<svg viewBox="-32 -40 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M 0,-32 Q -28,-8 -28,15 Q -28,38 0,38 Q 28,38 28,15 Q 28,-8 0,-32 Z" fill="#C8C4D8" stroke="#3a4530" stroke-width="1.6" stroke-linejoin="round"/><path d="M -12,4 Q -8,0 -4,4" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M 4,4 Q 8,0 12,4" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/><path d="M -7,22 Q 0,16 7,22" fill="none" stroke="#3a4530" stroke-width="1.6" stroke-linecap="round"/></svg>'}
+];
+const EMO_BY_KEY = Object.fromEntries(EMOTIONS.map(e=>[e.key,e]));
+const REASONS = [{key:'economic',name:'經濟狀況'},{key:'relationship',name:'人際關係'},{key:'health',name:'健康狀況'},{key:'learning',name:'學習狀況'},{key:'other',name:'其他'}];
+
+// 小助理粉嫩水滴 avatar SVG（含笑臉和腮紅）
+const HELPER_AVATAR_SVG = `
+<svg viewBox="-40 -50 80 100" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 0,-42 Q -36,-14 -36,18 Q -36,48 0,48 Q 36,48 36,18 Q 36,-14 0,-42 Z" fill="#F5BCC8" stroke="#7D3F52" stroke-width="2.2" stroke-linejoin="round"/>
+  <ellipse cx="-18" cy="18" rx="5" ry="3.5" fill="#F09BAA" opacity="0.65"/>
+  <ellipse cx="18" cy="18" rx="5" ry="3.5" fill="#F09BAA" opacity="0.65"/>
+  <path d="M -14,6 Q -10,2 -6,6" fill="none" stroke="#7D3F52" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M 6,6 Q 10,2 14,6" fill="none" stroke="#7D3F52" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M -9,22 Q 0,30 9,22" fill="none" stroke="#7D3F52" stroke-width="2.2" stroke-linecap="round"/>
+</svg>`;
+
+const state = {
+  participantId:null, shortCode:null, taskTimes:{},
+  data:{task1_emotions:[], task2_activity_type:null, task2_activity_text:'', task2_photo_url:'',
+        task2_current_emotion:null, task2b_diary:'', task2b_reasons:[], task2b_difficulty:4}
+};
+
+const SCREENS = ['intro','task1','task2a','task2b','task3','thanks'];
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('progress-bar').style.width = (SCREENS.indexOf(name)/(SCREENS.length-1)*100)+'%';
+  window.scrollTo(0,0);
+}
+function showLoading(t){document.getElementById('loading-text').textContent=t||'處理中...';document.getElementById('loading').classList.add('active');}
+function hideLoading(){document.getElementById('loading').classList.remove('active');}
+
+function renderEmotions(id, multi){
+  const c=document.getElementById(id);c.innerHTML='';
+  EMOTIONS.forEach(e=>{
+    const d=document.createElement('div');d.className='em';d.dataset.key=e.key;
+    d.innerHTML=`<div class="em-svg">${e.svg}</div><div class="em-name">${e.name}</div>`;
+    d.onclick=()=>{
+      if(multi){
+        d.classList.toggle('selected');
+        const sel=c.querySelectorAll('.em.selected');
+        if(sel.length>3){d.classList.remove('selected');return;}
+        state.data.task1_emotions=Array.from(sel).map(x=>x.dataset.key);
+        document.getElementById('t1-hint').textContent=`已選 ${sel.length} 個`+(sel.length<2?'（至少 2 個）':'');
+        document.getElementById('btn-task1-next').disabled=sel.length<2;
+      } else {
+        c.querySelectorAll('.em').forEach(x=>x.classList.remove('selected'));
+        d.classList.add('selected');
+        state.data.task2_current_emotion=e.key;
+        checkTask2aReady();
+      }
+    };
+    c.appendChild(d);
+  });
+}
+function selectActivity(el,type){
+  document.querySelectorAll('.act-btn').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');state.data.task2_activity_type=type;checkTask2aReady();
+}
+function checkTask2aReady(){
+  const text=document.getElementById('activity-text').value.trim();
+  document.getElementById('btn-task2a-next').disabled=!(state.data.task2_activity_type && state.data.task2_current_emotion && text.length>0);
+}
+function renderReasons(){
+  const c=document.getElementById('reasons-list');c.innerHTML='';
+  REASONS.forEach(r=>{
+    const d=document.createElement('div');d.className='reason';
+    d.innerHTML=`<div class="reason-cb"></div><div class="reason-label">${r.name}</div>`;
+    d.onclick=()=>{
+      d.classList.toggle('selected');
+      const sel=c.querySelectorAll('.reason.selected');
+      state.data.task2b_reasons=Array.from(sel).map(x=>{
+        const lbl=x.querySelector('.reason-label').textContent;
+        return REASONS.find(r=>r.name===lbl).key;
+      });
+    };
+    c.appendChild(d);
+  });
+}
+
+// ====== A2B2 小助理：肯定 → 映照 → 邀請 → 歸位 ======
+function generateHelperMessage(){
+  const isCreation = state.data.task2_activity_type === 'creation';
+  const actText = state.data.task2_activity_text || '';
+  const curEmo = state.data.task2_current_emotion;
+  const curName = curEmo ? EMO_BY_KEY[curEmo].name : '';
+  const isPositive = curEmo && EMO_BY_KEY[curEmo].valence > 0;
+  const diff = state.data.task2b_difficulty || 4;
+
+  // 肯定 (固定基底)
+  const affirm = ['辛苦的你','你已經做到了 💗'];
+
+  // 映照 (依輸入動態)
+  let mirror;
+  if(isCreation){
+    mirror = [`做了 ${actText}`,'把心放在指尖上','這份心意 是真的'];
+  } else if(['tired','worried','sad'].includes(curEmo)){
+    mirror = [`雖然今天有點 ${curName}`,'你還是走到了這裡','這份努力 我都看見了'];
+  } else if(isPositive){
+    mirror = [`給自己留了這段 ${curName} 的時間`,'這是你給自己的禮物'];
+  } else {
+    mirror = ['為自己撐出了這段時間','這已經很不容易'];
+  }
+
+  // 邀請自我照顧
+  const invite = ['我們可以','先去好好吃點東西','喝一杯熱熱的茶'];
+
+  // 歸位 (回到照顧家人)
+  const closing = ['再回去','陪伴他們 💗'];
+
+  return {affirm, mirror, invite, closing};
+}
+
+function renderHelperCard(){
+  const msg = generateHelperMessage();
+  const card = document.getElementById('helper-card');
+  card.innerHTML = `
+    <div class="helper-badge"><span class="h-icon">♥</span><span>心滴・小助理</span></div>
+
+    <div class="helper-avatar-wrap">
+      <div class="helper-avatar">${HELPER_AVATAR_SVG}</div>
+    </div>
+    <div class="helper-tail"></div>
+
+    <div class="heart-frame">
+      <div class="floating-drops">
+        <span class="floating-drop fd-1">💧</span>
+        <span class="floating-drop fd-2">♥</span>
+        <span class="floating-drop fd-3">💧</span>
+        <span class="floating-drop fd-4">♥</span>
+        <span class="floating-drop fd-5">💧</span>
+      </div>
+      <div class="speech-text">
+        <div class="block affirm">${msg.affirm.join('<br>')}</div>
+        <div class="block mirror">${msg.mirror.join('<br>')}</div>
+        <div class="block invite">${msg.invite.join('<br>')}</div>
+        <div class="block closing">${msg.closing.join('<br>')}</div>
+      </div>
+    </div>
+  `;
+}
+
+let taskStarts={};
+function startTask1(){taskStarts.task1=Date.now();showScreen('task1');}
+function completeTask1(){
+  const dur=Math.round((Date.now()-taskStarts.task1)/1000);
+  state.taskTimes.task1={started:new Date(taskStarts.task1).toISOString(),completed:new Date().toISOString(),duration:dur};
+  taskStarts.task2=Date.now();showScreen('task2a');
+}
+function goTask2b(){showScreen('task2b');}
+function completeTask2(){
+  state.data.task2b_diary=document.getElementById('diary-text').value.trim();
+  state.data.task2b_difficulty=parseInt(document.getElementById('diff-slider').value);
+  state.data.task2_activity_text=document.getElementById('activity-text').value.trim();
+  const dur=Math.round((Date.now()-taskStarts.task2)/1000);
+  state.taskTimes.task2={started:new Date(taskStarts.task2).toISOString(),completed:new Date().toISOString(),duration:dur};
+  taskStarts.task3=Date.now();renderHelperCard();showScreen('task3');
+}
+async function completeTask3(){
+  const dur=Math.round((Date.now()-taskStarts.task3)/1000);
+  state.taskTimes.task3={started:new Date(taskStarts.task3).toISOString(),completed:new Date().toISOString(),duration:dur};
+  await saveProgress();
+  await saveFinal();
+  document.getElementById('short-code').textContent=state.shortCode;
+  showScreen('thanks');
+}
+
+async function autoInit(){
+  const errEl=document.getElementById('init-error');
+  const btn=document.getElementById('btn-start');
+  const pidDisplay=document.getElementById('pid-display');
+  const now=new Date();
+  const stamp=`${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+  const rand=Math.random().toString(36).substring(2,5).toUpperCase();
+  const participantId=`T_${stamp}_${rand}`;
+  const shortCode=String(Math.floor(1000+Math.random()*9000));
+  state.participantId=participantId;state.shortCode=shortCode;
+  try{
+    const baseRec={id:participantId,participant_code:shortCode,condition:CONDITION,session_id:SESSION_ID,status:'in_progress'};
+    const consentRec=Object.assign({},baseRec,{
+      consent_given: (window.__consent && window.__consent.given) ? true : false,
+      consent_at: (window.__consent && window.__consent.at) ? window.__consent.at : null,
+      consent_version: (window.__consent && window.__consent.version) ? window.__consent.version : 'proto-v1'
+    });
+    try{
+      await sbInsert('participants', consentRec);
+    }catch(ce){
+      // 後台尚未新增 consent 欄位時，自動退回不帶 consent 欄位（原型仍可跑流程）
+      console.warn('consent 欄位可能尚未建立，改用基本欄位建檔：', ce && ce.message);
+      await sbInsert('participants', baseRec);
+    }
+    pidDisplay.textContent=`代碼 ${shortCode} · ${CONDITION} · ${SESSION_ID}`;
+    btn.textContent='開始任務 1';btn.disabled=false;
+  }catch(e){
+    console.error('Insert failed:',e);
+    pidDisplay.textContent=`❌ 連線失敗`;
+    pidDisplay.style.background='#FBE8DA';pidDisplay.style.color='#B26B4A';
+    errEl.style.display='block';
+    errEl.innerHTML=`<strong>⚠️ 無法連接到資料庫</strong><br>請聯絡研究人員。錯誤：<code>${e.message||JSON.stringify(e)}</code>`;
+    btn.textContent='無法繼續';btn.disabled=true;
+  }
+}
+
+async function saveProgress(){
+  showLoading('儲存中...');
+  try{
+    const upd={
+      task1_started_at:state.taskTimes.task1.started, task1_completed_at:state.taskTimes.task1.completed, task1_duration_seconds:state.taskTimes.task1.duration,
+      task1_emotions:state.data.task1_emotions,
+      task2_started_at:state.taskTimes.task2.started, task2_completed_at:state.taskTimes.task2.completed, task2_duration_seconds:state.taskTimes.task2.duration,
+      task2_activity_type:state.data.task2_activity_type, task2_activity_text:state.data.task2_activity_text, task2_photo_url:state.data.task2_photo_url,
+      task2_current_emotion:state.data.task2_current_emotion,
+      task2b_diary:state.data.task2b_diary, task2b_reasons:state.data.task2b_reasons, task2b_difficulty:state.data.task2b_difficulty,
+      task3_started_at:state.taskTimes.task3.started, task3_completed_at:state.taskTimes.task3.completed, task3_duration_seconds:state.taskTimes.task3.duration
+    };
+    await sbUpdate('participants','id',state.participantId,upd);
+  }catch(e){console.error('saveProgress error',e);}
+  hideLoading();
+}
+
+async function saveFinal(){
+  showLoading('儲存中...');
+  try{
+    await sbUpdate('participants','id',state.participantId,{completed_at:new Date().toISOString(),status:'completed'});
+  }catch(e){console.error('saveFinal error',e);}
+  hideLoading();
+}
+
+renderEmotions('emotions-task1', true);
+renderEmotions('emotions-now', false);
+renderReasons();
+document.getElementById('activity-text').addEventListener('input', checkTask2aReady);
+
+document.getElementById('photo-input').addEventListener('change', (e)=>{
+  const file=e.target.files[0]; if(!file) return;
+  const status=document.getElementById('photo-status');
+  status.style.display='block'; status.textContent='處理照片中...';
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const maxDim=800; let w=img.width, h=img.height;
+      if(w>maxDim||h>maxDim){if(w>h){h=h*maxDim/w;w=maxDim;}else{w=w*maxDim/h;h=maxDim;}}
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const resized=canvas.toDataURL('image/jpeg',0.75);
+      state.data.task2_photo_url=resized;
+      const preview=document.getElementById('photo-preview');
+      preview.src=resized; preview.style.display='block';
+      status.textContent=`✓ 照片已準備好（${Math.round(resized.length/1024)} KB）`;
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+
+// ===== 知情同意（原型版）=====
+window.__consent = { given:false, at:null, version:"proto-v1" };
+function syncConsent(){
+  document.getElementById('consentBtn').disabled = !document.getElementById('consentChk').checked;
+}
+function acceptConsent(){
+  window.__consent.given = true;
+  window.__consent.at = new Date().toISOString();
+  document.getElementById('screen-consent').classList.remove('active');
+  document.getElementById('screen-intro').classList.add('active');
+}
+
+autoInit();
+</script>
+
+</body>
+</html>
